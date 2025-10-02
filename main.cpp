@@ -29,15 +29,16 @@ void decode_steganography(int image_data[], int data_size, std::string key) {
      */
 
     if (data_size <= 0 || key.empty()) return;
-    std::size_t keyPos = 0;
-    int safety = data_size * 10;
 
-    while (safety-- > 0) {
+    int currentIndex = 1000 % data_size;
+    std::size_t keyPos = 0;
+
+    while (true) {
         int jump = static_cast<unsigned char>(key[keyPos]);
         keyPos = (keyPos + 1) % key.size();
-
         currentIndex = (currentIndex + (jump % data_size)) % data_size;
-        int value == image_data[currentIndex];
+
+        int value = image_data[currentIndex];
         if (value == 0) break;
 
         std::cout << static_cast<char>(value);
