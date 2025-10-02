@@ -28,6 +28,32 @@ void decode_steganography(int image_data[], int data_size, std::string key) {
      * - If the value is 0, stop the loop. Otherwise, cast the value to a `char` and print it.
      */
 
+    if (data_size <= 0 || key.empty()) return;
+
+    const int keyLen = static_cast<int>(key.size());
+    int steps = 0;
+
+    // Safety cap to avoid infinite loops if data is malformed
+    const int max_steps = data_size * 2;
+
+    while (steps < max_steps) {
+        // Use ASCII of repeating key chars as jump distance
+        int jump = static_cast<unsigned char>(key[steps % keyLen]);
+
+        // Ensure we always move forward at least 1
+        if (jump == 0) jump = 1;
+
+        // Move and wrap within bounds
+        currentIndex = (currentIndex + jump) % data_size;
+
+        int val = image_data[currentIndex];
+
+        // 0 marks the end of the hidden message
+        if (val == 0) break;
+
+        std::cout << static_cast<char>(val);
+        ++steps;
+    }
 }
 
 
