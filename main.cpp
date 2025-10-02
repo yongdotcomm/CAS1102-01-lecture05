@@ -73,6 +73,5 @@ int main() {
 
     delete[] image_data_int;
 
-    std:: <<"hi"<<std::endl
     return 0;
 }
