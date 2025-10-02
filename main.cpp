@@ -28,6 +28,22 @@ void decode_steganography(int image_data[], int data_size, std::string key) {
      * - If the value is 0, stop the loop. Otherwise, cast the value to a `char` and print it.
      */
 
+    if (data_size <= 0 || key.empty()) return;
+    std::size_t keyPos = 0;
+    int safety = data_size * 10;
+
+    while (safety-- > 0) {
+        int jump = static_cast<unsigned char>(key[keyPos]);
+        keyPos = (keyPos + 1) % key.size();
+
+        currentIndex = (currentIndex + (jump % data_size)) % data_size;
+        int value == image_data[currentIndex];
+        if (value == 0) break;
+
+        std::cout << static_cast<char>(value);
+
+    }
+
 }
 
 
