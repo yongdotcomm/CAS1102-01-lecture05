@@ -28,32 +28,56 @@ void decode_steganography(int image_data[], int data_size, std::string key) {
      * - If the value is 0, stop the loop. Otherwise, cast the value to a `char` and print it.
      */
 
-if (data_size <= 0 || key.empty()) return;
+// --- DEBUG VERSION: paste under the TODO to see what's happening ---
+if (data_size <= 0 || key.empty()) {
+    std::cerr << "[Debug] data_size <= 0 or empty key\n";
+    return;
+}
 
 int currentIndex = 1000 % data_size;
 std::size_t keyPos = 0;
 
-const int safety_limit = data_size * 4;  // prevent infinite loop
-int steps = 0;
+const int hard_cap_steps = std::max(40, data_size > 0 ? data_size / 50 : 40); // print a handful of steps
+int printed_chars = 0;
+int zeros_in_a_row = 0;
 
-while (steps < safety_limit) {
-    // Use ASCII value of current key character
-    int jump = static_cast<unsigned char>(key[keyPos]);
+std::cerr << "[Debug] data_size=" << data_size << " startIdx=" << currentIndex
+          << " key=\"" << key << "\" (len=" << key.size() << ")\n";
+
+for (int step = 0; step < hard_cap_steps; ++step) {
+    unsigned char k = static_cast<unsigned char>(key[keyPos]);
+    int jump = static_cast<int>(k % data_size);
+    int nextIndex = (currentIndex + jump) % data_size;
+    int value = image_data[nextIndex];
+
+    std::cerr << "[Debug] step=" << step
+              << " key[" << keyPos << "]='" << key[keyPos] << "'(" << (int)k << ")"
+              << " jump=" << jump
+              << " idx " << currentIndex << "->" << nextIndex
+              << " value=" << value << "\n";
+
+    currentIndex = nextIndex;
     keyPos = (keyPos + 1) % key.size();
 
-    // Update index and wrap around
-    currentIndex = (currentIndex + (jump % data_size)) % data_size;
-
-    int value = image_data[currentIndex];
-    if (value == 0) break;
+    if (value == 0) {
+        ++zeros_in_a_row;
+        if (zeros_in_a_row >= 2) {
+            std::cerr << "[Debug] two consecutive zeros; likely end or wrong key.\n";
+            break;
+        }
+        continue; // don't print a char for zero
+    } else {
+        zeros_in_a_row = 0;
+    }
 
     std::cout << static_cast<char>(value);
-    ++steps;
+    ++printed_chars;
 }
 
-if (steps >= safety_limit) {
-    std::cerr << "\n[Warning] Aborted due to safety limit (no 0 terminator found?).\n";
-}
+// flush so you can see partial output
+std::cout.flush();
+std::cerr << "[Debug] printed_chars=" << printed_chars << "\n";
+// --- END DEBUG VERSION ---
 
 
 }
