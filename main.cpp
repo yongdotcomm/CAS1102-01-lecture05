@@ -64,9 +64,18 @@ int main() {
 
     unsigned char* img_data_char = stbi_load(image_path, &width, &height, &channels, 1);
 
-    std::cout << "Width: " << width << ", Height: " << height 
-          << ", Data size: " << data_size << std::endl;
-
+    //from here
+    if (!img_data_char) {
+        std::cerr << "❌ Failed to load image: " << image_path << std::endl;
+        return 1;
+    }
+    std::cout << "✅ Loaded " << image_path
+              << " width=" << width
+              << " height=" << height
+              << " channels=" << channels
+              << " data_size=" << (width * height) << std::endl;
+    // to here
+    
     int data_size = width * height;
 
     int* image_data_int = new int[data_size];
